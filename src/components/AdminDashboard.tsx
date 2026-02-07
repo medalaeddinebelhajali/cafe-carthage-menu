@@ -137,7 +137,9 @@ async function sha256(text: string) {
     setError('');
     setSuccess('');
   };
-
+  const handlelogout = () => {
+    localStorage.clear();
+  };
   if (loading) {
     return (
       <div className="admin-loading">
@@ -165,18 +167,21 @@ async function sha256(text: string) {
     <div className="admin-dashboard">
       <div className="admin-header">
         <h1>📋 Admin Dashboard</h1>
-        <p>Manage Café Carthage Menu Products</p>
+        <p>Café Carthage Menu Products</p
+        <button type="button" onClick={handlelogout} className="btn btn-primary">
+          Déconnecter
+        </button>
       </div>
-
+      
       {error && <div className="alert error">{error}</div>}
       {success && <div className="alert success">{success}</div>}
 
       <div className="admin-content">
         <div className="form-section">
-          <h2>{editingId ? 'Edit Product' : 'Add New Product'}</h2>
+          <h2>{editingId ? 'Modifier un Produit' : 'Ajouter un Produit'}</h2>
           <form onSubmit={handleSubmit} className="product-form">
             <div className="form-group">
-              <label htmlFor="name">Product Name *</label>
+              <label htmlFor="name">Nom du Produit *</label>
               <input
                 type="text"
                 id="name"
@@ -187,7 +192,7 @@ async function sha256(text: string) {
             </div>
 
             <div className="form-group">
-              <label htmlFor="price">Price *</label>
+              <label htmlFor="price">Prix *</label>
               <input
                 type="text"
                 id="price"
@@ -199,14 +204,14 @@ async function sha256(text: string) {
             </div>
 
             <div className="form-group">
-              <label htmlFor="category">Category *</label>
+              <label htmlFor="category">Catégorie *</label>
               <select
                 id="category"
                 value={formData.categoryId}
                 onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                 required
               >
-                <option value="">Select a category</option>
+                <option value="">Choisir une catégorie</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {renderIcon(category.icon)} {category.name}
@@ -222,17 +227,17 @@ async function sha256(text: string) {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
-                placeholder="Optional description"
+                placeholder="Description optionnel"
               />
             </div>
 
             <div className="form-actions">
               <button type="submit" className="btn btn-primary">
-                {editingId ? 'Update Product' : 'Add Product'}
+                {editingId ? 'Modifier le Produit' : 'Ajouter un Produit'}
               </button>
               {editingId && (
                 <button type="button" onClick={handleCancel} className="btn btn-secondary">
-                  Cancel
+                  Annuler
                 </button>
               )}
             </div>
@@ -257,13 +262,13 @@ async function sha256(text: string) {
                     onClick={() => handleEdit(product)}
                     className="btn btn-edit"
                   >
-                    ✏️ Edit
+                    ✏️ Modifier
                   </button>
                   <button
                     onClick={() => handleDelete(product.id)}
                     className="btn btn-delete"
                   >
-                    🗑️ Delete
+                    🗑️ Supprimer
                   </button>
                 </div>
               </div>
