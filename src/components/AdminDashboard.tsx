@@ -167,7 +167,7 @@ async function sha256(text: string) {
     <div className="admin-dashboard">
       <div className="admin-header">
         <h1>📋 Admin Dashboard</h1>
-        <p>Café Carthage Menu Products</p
+        <p>Café Carthage Menu Products</p>
         <button type="button" onClick={handlelogout} className="btn btn-primary">
           Déconnecter
         </button>
