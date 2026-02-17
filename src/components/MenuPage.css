@@ -142,28 +142,62 @@
     margin-top: 4px;
 }
 
-/* Category Quick Navigation on Cover */
+/* Category Quick Navigation */
 .category-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 25px;
+    justify-content: center;
+}
+
+.category-btn {
+    background: rgba(0, 137, 123, 0.08);
+    border: 1px solid rgba(0, 137, 123, 0.3);
+    color: var(--primary-teal);
+    padding: 8px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    transition: 0.3s;
+    white-space: nowrap;
+}
+
+.category-btn:hover {
+    background: var(--primary-teal);
+    color: var(--white);
+    border-color: var(--primary-teal);
+}
+
+.category-btn.active {
+    background: var(--primary-teal);
+    color: var(--white);
+    border-color: var(--primary-teal);
+    font-weight: 600;
+}
+
+/* Cover page overrides for category nav */
+.cover-page .category-nav {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
     margin-top: 30px;
 }
 
-.category-btn {
+.cover-page .category-btn {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: white;
     padding: 10px;
     border-radius: 8px;
-    cursor: pointer;
-    display: flex;
     flex-direction: column;
-    align-items: center;
-    transition: 0.3s;
+    font-size: 1rem;
 }
 
-.category-btn:hover {
+.cover-page .category-btn:hover {
     background: var(--white);
     color: var(--primary-teal);
 }
