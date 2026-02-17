@@ -22,13 +22,6 @@ const MenuPage: React.FC = () => {
   const [currentSpread, setCurrentSpread] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const spreads = [
-    { title: 'Cover', categories: [] },
-    { title: 'Café & Thé', categories: ['cafe', 'the', 'boissons', 'eau'] },
-    { title: 'Pâtisseries & Salée', categories: ['patisseries', 'salee', 'narguile'] },
-    { title: 'Jeux & Fin', categories: ['jeux'] }
-  ];
-
   const fetchCategories = useCallback(async () => {
     try {
       const data = await getMenu();
@@ -44,20 +37,17 @@ const MenuPage: React.FC = () => {
     fetchCategories();
   }, [fetchCategories]);
 
-  const goToCategory = (spreadIndex: number) => {
-    setCurrentSpread(spreadIndex);
+  const totalPages = categories.length + 2; // Cover + Categories + Thank You
+
+  const goToCategory = (index: number) => {
+    setCurrentSpread(index + 1);
   };
 
   const changePage = (direction: number) => {
     const newSpread = currentSpread + direction;
-    if (newSpread >= 0 && newSpread < (spreads.length + 1)) {
+    if (newSpread >= 0 && newSpread < totalPages) {
       setCurrentSpread(newSpread);
     }
-  };
-
-  const getCategoriesForSpread = (spreadIndex: number) => {
-    const spread = spreads[spreadIndex];
-    return categories.filter(cat => spread.categories.includes(cat.id));
   };
 
   const renderIcon = (icon: string) => {
@@ -84,93 +74,104 @@ const MenuPage: React.FC = () => {
             <p className="page-subtitle">Notre Menu</p>
           </div>
           <div className="category-nav">
-            {categories.map(category => (
-              <button 
+            {categories.map((category, index) => (
+              <button
                 key={category.id}
                 className="category-btn"
-                onClick={() => {
-                  const index = spreads.findIndex(s => s.categories.includes(category.id));
-                  if (index !== -1) goToCategory(index);
-                }}
+                onClick={() => goToCategory(index)}
               >
                 {renderIcon(category.icon)}
                 <span>{category.name}</span>
               </button>
             ))}
           </div>
-          <div className="page-number">1</div>
+          <div className="page-number">1 / {totalPages}</div>
         </div>
       );
     }
-    else if (spreadIndex === spreads.length ) {
+    // Thank You Page
+    else if (spreadIndex === totalPages - 1) {
       return (
         <div
-            className="page full-page thankyou-page"
-            style={{
-              background: "linear-gradient(135deg,#00897b,#00695c)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <div style={{ textAlign: "center", color: "#fff" }}>
-              <h2
-                style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: "3rem",
-                  marginBottom: "20px",
-                  fontStyle: "italic"
-                }}
-              >
-                Merci!
-              </h2>
-          
-              <p style={{ fontSize: "1.2rem", marginBottom: "30px" }}>
-                شكرا
-              </p>
-          
-              <div
-                style={{
-                  width: "80px",
-                  height: "2px",
-                  background: "#fff",
-                  margin: "0 auto 30px"
-                }}
-              />
-          
-              <p style={{ fontSize: "1rem", opacity: 0.9 }}>Café Carthage</p>
-          
-              
-            </div>
-          
-            <div className="page-number">{currentSpread + 1} / {spreads.length +1}</div>
+          className="page full-page thankyou-page"
+          style={{
+            background: "linear-gradient(135deg,#00897b,#00695c)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <div style={{ textAlign: "center", color: "#fff" }}>
+            <h2
+              style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: "3rem",
+                marginBottom: "20px",
+                fontStyle: "italic"
+              }}
+            >
+              Merci!
+            </h2>
+
+            <p style={{ fontSize: "1.2rem", marginBottom: "30px" }}>
+              شكرا
+            </p>
+
+            <div
+              style={{
+                width: "80px",
+                height: "2px",
+                background: "#fff",
+                margin: "0 auto 30px"
+              }}
+            />
+
+            <p style={{ fontSize: "1rem", opacity: 0.9 }}>Café Carthage</p>
+
+
           </div>
+
+          <div className="page-number">{spreadIndex + 1} / {totalPages}</div>
+        </div>
 
       );
     }
-    // Menu Spreads
-    const spreadCategories = getCategoriesForSpread(spreadIndex);
+
+    // Category Page
+    const category = categories[spreadIndex - 1]; // -1 because 0 is Cover
+    if (!category) return null;
+
     return (
       <div className="page full-page">
-        {spreadCategories.map(category => (
-          <div key={category.id} className="menu-section">
-            <div className="section-header">
-              {renderIcon(category.icon)}
-              <h3 className="section-title">{category.name}</h3>
-            </div>
-            {(category.items || []).map(item => (
-              <div key={item.id} className="menu-item">
-                <div className="item-header">
-                  <span className="item-name">{item.name}</span>
-                  <span className="item-dots"></span>
-                  <span className="item-price">{item.price}</span>
-                </div>
-                {item.description && <p className="item-description">{item.description}</p>}
-              </div>
-            ))}
+        <div className="category-nav">
+          {categories.map((cat, idx) => (
+            <button
+              key={cat.id}
+              className={`category-btn${cat.id === category.id ? ' active' : ''}`}
+              onClick={() => goToCategory(idx)}
+            >
+              {renderIcon(cat.icon)}
+              <span>{cat.name}</span>
+            </button>
+          ))}
+        </div>
+        <div className="menu-section">
+          <div className="section-header">
+            {renderIcon(category.icon)}
+            <h3 className="section-title">{category.name}</h3>
           </div>
-        ))}
-        <div className="page-number">{spreadIndex + 1}</div>
+          {(category.items || []).map(item => (
+            <div key={item.id} className="menu-item">
+              <div className="item-header">
+                <span className="item-name">{item.name}</span>
+                <span className="item-dots"></span>
+                <span className="item-price">{item.price}</span>
+              </div>
+              {item.description && <p className="item-description">{item.description}</p>}
+            </div>
+          ))}
+        </div>
+        <div className="page-number">{spreadIndex + 1} / {totalPages}</div>
       </div>
     );
   };
@@ -192,27 +193,31 @@ const MenuPage: React.FC = () => {
 
         {/* Navigation */}
         <div className="navigation">
-          <button 
-            className="nav-btn" 
+          <button
+            className="nav-btn"
             onClick={() => changePage(-1)}
             disabled={currentSpread === 0}
           >
             ← Précédent
           </button>
-          <button 
-            className="nav-btn" 
+          <button
+            className="nav-btn"
             onClick={() => changePage(1)}
-            disabled={currentSpread === spreads.length - 1}
+            disabled={currentSpread === totalPages - 1}
           >
             Suivant →
           </button>
         </div>
         <div className="page-indicator">
-          Page {currentSpread + 1} / {spreads.length +1}
+          Page {currentSpread + 1} / {totalPages}
         </div>
       </div>
     </div>
   );
+};
+
+export default MenuPage;
+
 };
 
 export default MenuPage;
