@@ -83,7 +83,6 @@ const MenuPage: React.FC = () => {
         <div className="hero-overlay">
           <Link to="/apropos" className="about-link" style={{ position: 'absolute', top: '0.2rem', right: '0.2rem', color: 'rgba(255, 255, 255, 0.8)', textDecoration: 'none', fontSize: '1rem', fontWeight: 500, background: 'rgba(0, 0, 0, 0.3)', padding: '0.5rem 1rem', borderRadius: '20px', backdropFilter: 'blur(5px)' }}>À Propos de Nous</Link>
           <img src="/images/logo.png" alt="icon" className="logo-img" />
-          <h1 className="hero-logo"></h1>
           <div className="hero-divider"></div>
           <p className="hero-subtitle">Djerba</p>
           <p className="hero-tagline">Une expérience authentique dans le cœur de Djerba</p>
