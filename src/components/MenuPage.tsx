@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { getMenu } from '../api/products';
+import { motion } from 'framer-motion';
 import './MenuPage.css';
 
 interface MenuItem {
@@ -19,13 +21,14 @@ interface Category {
 
 const MenuPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [currentSpread, setCurrentSpread] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState<string>('all');
 
   const fetchCategories = useCallback(async () => {
     try {
       const data = await getMenu();
       setCategories(data);
+      setActiveCategory('all');
       setLoading(false);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -37,16 +40,19 @@ const MenuPage: React.FC = () => {
     fetchCategories();
   }, [fetchCategories]);
 
-  const totalPages = categories.length + 2; // Cover + Categories + Thank You
+  const selectCategory = (categoryId: string) => {
+    setActiveCategory(categoryId);
 
-  const goToCategory = (index: number) => {
-    setCurrentSpread(index + 1);
-  };
-
-  const changePage = (direction: number) => {
-    const newSpread = currentSpread + direction;
-    if (newSpread >= 0 && newSpread < totalPages) {
-      setCurrentSpread(newSpread);
+    // Scroll to the top of the menu container when a filter is clicked
+    // so they are brought back up to see the items if they were scrolled down.
+    const element = document.querySelector('.menu-container');
+    if (element) {
+      const yOffset = -90; // Offset for sticky navbar
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      // Only scroll up if they are currently lower down the page
+      if (window.scrollY > y) {
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
     }
   };
 
@@ -58,124 +64,6 @@ const MenuPage: React.FC = () => {
     return <span className="category-icon-emoji">{icon}</span>;
   };
 
-  const renderPage = (spreadIndex: number) => {
-    // Cover Page
-    if (spreadIndex === 0) {
-      return (
-        <div className="page full-page cover-page">
-          <div className="cover-content">
-            <h1 className="cover-logo">Café Carthage</h1>
-            <div className="cover-divider"></div>
-            <p className="cover-subtitle">Djerba</p>
-            <p className="cover-tagline">Une expérience authentique dans le cœur de Carthage</p>
-          </div>
-          <div className="page-header">
-            <h2 className="page-title">Bienvenue</h2>
-            <p className="page-subtitle">Notre Menu</p>
-          </div>
-          <div className="category-nav">
-            {categories.map((category, index) => (
-              <button
-                key={category.id}
-                className="category-btn"
-                onClick={() => goToCategory(index)}
-              >
-                {renderIcon(category.icon)}
-                <span>{category.name}</span>
-              </button>
-            ))}
-          </div>
-          <div className="page-number">1 / {totalPages}</div>
-        </div>
-      );
-    }
-    // Thank You Page
-    else if (spreadIndex === totalPages - 1) {
-      return (
-        <div
-          className="page full-page thankyou-page"
-          style={{
-            background: "linear-gradient(135deg,#00897b,#00695c)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
-          <div style={{ textAlign: "center", color: "#fff" }}>
-            <h2
-              style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: "3rem",
-                marginBottom: "20px",
-                fontStyle: "italic"
-              }}
-            >
-              Merci!
-            </h2>
-
-            <p style={{ fontSize: "1.2rem", marginBottom: "30px" }}>
-              شكرا
-            </p>
-
-            <div
-              style={{
-                width: "80px",
-                height: "2px",
-                background: "#fff",
-                margin: "0 auto 30px"
-              }}
-            />
-
-            <p style={{ fontSize: "1rem", opacity: 0.9 }}>Café Carthage</p>
-
-
-          </div>
-
-          <div className="page-number">{spreadIndex + 1} / {totalPages}</div>
-        </div>
-
-      );
-    }
-
-    // Category Page
-    const category = categories[spreadIndex - 1]; // -1 because 0 is Cover
-    if (!category) return null;
-
-    return (
-      <div className="page full-page">
-        <div className="category-nav">
-          {categories.map((cat, idx) => (
-            <button
-              key={cat.id}
-              className={`category-btn${cat.id === category.id ? ' active' : ''}`}
-              onClick={() => goToCategory(idx)}
-            >
-              {renderIcon(cat.icon)}
-              <span>{cat.name}</span>
-            </button>
-          ))}
-        </div>
-        <div className="menu-section">
-          <div className="section-header">
-            {renderIcon(category.icon)}
-            <h3 className="section-title">{category.name}</h3>
-          </div>
-          {(category.items || []).map(item => (
-            <div key={item.id} className="menu-item">
-              <div className="item-header">
-                <span className="item-name">{item.name}</span>
-                <span className="item-dots"></span>
-                <span className="item-price">{item.price}</span>
-              </div>
-              {item.description && <p className="item-description">{item.description}</p>}
-            </div>
-          ))}
-        </div>
-        <div className="page-number">{spreadIndex + 1} / {totalPages}</div>
-      </div>
-    );
-  };
-
   if (loading) {
     return (
       <div className="loading-container">
@@ -184,32 +72,107 @@ const MenuPage: React.FC = () => {
     );
   }
 
-  return (
-    <div className="menu-page">
-      <div className="magazine-wrapper">
-        <div className="page-spread active">
-          {renderPage(currentSpread)}
-        </div>
+  const displayedCategories = activeCategory === 'all'
+    ? categories
+    : categories.filter(c => c.id === activeCategory);
 
-        {/* Navigation */}
-        <div className="navigation">
-          <button
-            className="nav-btn"
-            onClick={() => changePage(-1)}
-            disabled={currentSpread === 0}
-          >
-            ← Précédent
-          </button>
-          <button
-            className="nav-btn"
-            onClick={() => changePage(1)}
-            disabled={currentSpread === totalPages - 1}
-          >
-            Suivant →
-          </button>
+  return (
+    <div className="single-menu-page">
+      {/* Hero Cover Section */}
+      <div className="hero-cover">
+        <div className="hero-overlay">
+          <Link to="/apropos" className="about-link" style={{ position: 'absolute', top: '0.2rem', right: '0.2rem', color: 'rgba(255, 255, 255, 0.8)', textDecoration: 'none', fontSize: '1rem', fontWeight: 500, background: 'rgba(0, 0, 0, 0.3)', padding: '0.5rem 1rem', borderRadius: '20px', backdropFilter: 'blur(5px)' }}>À Propos de Nous</Link>
+          <img src="/images/logo.png" alt="icon" className="logo-img" />
+          <h1 className="hero-logo"></h1>
+          <div className="hero-divider"></div>
+          <p className="hero-subtitle">Djerba</p>
+          <p className="hero-tagline">Une expérience authentique dans le cœur de Djerba</p>
         </div>
-        <div className="page-indicator">
-          Page {currentSpread + 1} / {totalPages}
+      </div>
+
+      {/* Sticky Navbar */}
+      <div className="sticky-navbar">
+        <div className="nav-container">
+          {/* Tous Button acts as "Show All" filter */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <button
+              className={`nav-category-btn ${activeCategory === 'all' ? 'active' : ''}`}
+              onClick={() => selectCategory('all')}
+            >
+              <span className="category-icon-emoji">🍽️</span>
+              <span>Tous</span>
+            </button>
+          </motion.div>
+
+          {categories.map((cat, index) => (
+            <motion.div
+              key={cat.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: (index + 1) * 0.05 }}
+            >
+              <button
+                className={`nav-category-btn ${activeCategory === cat.id ? 'active' : ''}`}
+                onClick={() => selectCategory(cat.id)}
+              >
+                {renderIcon(cat.icon)}
+                <span>{cat.name}</span>
+              </button>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Menu Content */}
+      <div className="menu-container">
+        {displayedCategories.map((category) => (
+          <div key={category.id} id={`category-${category.id}`} className="menu-section">
+            <div className="section-header">
+              {renderIcon(category.icon)}
+              <h3 className="section-title">{category.name}</h3>
+            </div>
+
+            <motion.div 
+              className="items-grid"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              variants={{
+                visible: { transition: { staggerChildren: 0.1 } }
+              }}
+            >
+              {(category.items || []).map(item => (
+                <motion.div
+                  key={item.id}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+                  }}
+                  style={{ width: '100%' }}
+                >
+                  <div className="menu-item-card">
+                    <div className="item-header">
+                      <span className="item-name">{item.name}</span>
+                      <span className="item-dots"></span>
+                      <span className="item-price">{item.price}</span>
+                    </div>
+                    {item.description && <p className="item-description">{item.description}</p>}
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        ))}
+
+        {/* Thank You Footer */}
+        <div className="thank-you-footer">
+          <h2 className="thank-you-title">Merci!</h2>
+          <div className="thank-you-divider"></div>
+          <p className="thank-you-text">Café Carthage</p>
         </div>
       </div>
     </div>
@@ -217,5 +180,3 @@ const MenuPage: React.FC = () => {
 };
 
 export default MenuPage;
-
-
