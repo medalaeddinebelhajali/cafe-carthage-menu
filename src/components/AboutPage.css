@@ -113,3 +113,16 @@
         transform: translateY(0);
     }
 }
+
+@media (max-width: 480px) {
+    .contact-info {
+        padding: 1rem;
+    }
+    .about-page .back-button {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+    .info-item {
+        font-size: 1rem;
+    }
+}

@@ -7,7 +7,7 @@ import AboutPage from './components/AboutPage.tsx';
 
 function App() {
     return (
-        <Router>
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <main className="main-content">
                 <Routes>
                     <Route path="/" element={<MenuPage />} />
