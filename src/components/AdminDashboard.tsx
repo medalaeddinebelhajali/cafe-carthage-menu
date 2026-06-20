@@ -185,6 +185,7 @@ const AdminDashboard: React.FC = () => {
     navigate("/login");
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const renderIcon = (icon: string) => {
     const isImage = /\.(png|jpg|jpeg|svg|webp)$/i.test(icon);
     if (isImage) {

@@ -88,6 +88,7 @@ const MenuPage: React.FC = () => {
     });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const removeFromCart = (itemId: number) => {
     setCart((prevCart) => {
       const existing = prevCart.find((i) => i.id === itemId);
@@ -98,6 +99,7 @@ const MenuPage: React.FC = () => {
     });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const clearCart = () => setCart([]);
 
   const parsePrice = (priceStr: string): number => {
@@ -113,6 +115,7 @@ const MenuPage: React.FC = () => {
     return cart.reduce((total, item) => total + item.count, 0);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const sendWhatsAppOrder = () => {
     let orderText = "Bonjour, je souhaite commander :\n\n";
     cart.forEach(item => {
@@ -291,6 +294,7 @@ const MenuPage: React.FC = () => {
                 }}
               >
                 {category.filteredItems.map((item) => {
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   const cartItem = cart.find((i) => i.id === item.id);
                   return (
                     <motion.div
